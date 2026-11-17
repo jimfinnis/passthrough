@@ -14,7 +14,14 @@ def get_extensions():  # -> MutableMapping[str, ModuleType]:
     Return a dict of all installed extension modules as {prefix: module}.
     """
 
-    extensions = importlib.metadata.entry_points(group="passthrough.extensions")
+    all_entry_points = importlib.metadata.entry_points()
+    if hasattr(all_entry_points, "select"):
+        # Python 3.10 and later
+        extensions = all_entry_points.select(group="passthrough.extensions")
+    else:
+        # Python 3.9 returns a dict of entry points by group, and its
+        # entry_points() doesn't accept a group argument
+        extensions = all_entry_points.get("passthrough.extensions", [])
 
     # FIXME: kluge. Passthrough doesn't register its entry points if installed in dev
     #  mode in another project (e.g. with poetry and develop=true)

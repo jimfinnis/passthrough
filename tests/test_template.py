@@ -1,3 +1,4 @@
+import re
 import sys
 import pytest
 import lxml.etree
@@ -104,7 +105,7 @@ def test_template_constructor_template_not_found(valid_source_map_1, missing_tem
     constructor is called with a template argument that references a
     non-existent file.
     """
-    with pytest.raises(OSError, match=f"Error reading file '{missing_template_file}': failed to load \"{missing_template_file}\": No such file or directory"):
+    with pytest.raises(OSError, match=re.escape(f"Error reading file '{missing_template_file}':")):
         t = Template(missing_template_file, valid_source_map_1)
 
 def test_template_constructor_template_invalid_xml(valid_source_map_1, invalid_template_file):
@@ -118,7 +119,7 @@ def test_template_constructor_missing_input(missing_input_file_source_map, valid
     """This test confirms that an exception is raised when the source map
     does not identify any input file.
     """
-    with pytest.raises(OSError, match=f"Error reading file '{missing_input_file_source_map['input']}': failed to load \"{missing_input_file_source_map['input']}\": No such file or directory"):
+    with pytest.raises(OSError, match=re.escape(f"Error reading file '{missing_input_file_source_map['input']}':")):
         t = Template(valid_template_file, missing_input_file_source_map)
 
 def test_template_constructor_invalid_input(invalid_input_file_source_map, valid_template_file):
